@@ -5,7 +5,7 @@ import {useApp} from '../../context/AppContext'
 import {EmptyState,LoadingState,Modal} from '../../components/ui'
 
 export default function TakeExam(){
-  const {id}=useParams(),nav=useNavigate(),{startAttempt,saveAnswer,submit,storageMode}=useApp()
+  const {id}=useParams(),nav=useNavigate(),{startAttempt,saveAnswer,submit}=useApp()
   const [session,setSession]=useState(null),[index,setIndex]=useState(0),[answers,setAnswers]=useState({}),[confirm,setConfirm]=useState(false)
   const [left,setLeft]=useState(0),[busy,setBusy]=useState(false),[saving,setSaving]=useState(false),[saveMessage,setSaveMessage]=useState(''),[error,setError]=useState('')
   const deadline=useRef(0),done=useRef(false),latest=useRef(null)
@@ -65,7 +65,7 @@ export default function TakeExam(){
     try{
       await saveAnswer(session.attemptId,question.id,optionIndex)
       setAnswers(previous=>({...previous,[question.id]:String(optionIndex)}))
-      setSaveMessage(storageMode==='local'?'Saved in this browser':'Answer saved')
+      setSaveMessage('Saved in this browser')
     }catch(e){setSaveMessage('');setError(e.message||'Your answer could not be saved. Try again.')}
     finally{setSaving(false)}
   }
@@ -90,7 +90,7 @@ export default function TakeExam(){
           <h2 id="question-heading" className="text-xl font-bold leading-7 text-slate-900 sm:text-2xl">{question.text}</h2>
           <div role="group" aria-label="Answer choices" className="space-y-2.5">{choices.map((choice,k)=><button type="button" key={k} disabled={busy||saving} aria-pressed={answers[question.id]===String(k)} onClick={()=>choose(k)} className={`flex min-h-14 w-full items-center gap-3 rounded-xl border px-3.5 py-3 text-left text-sm font-medium transition sm:px-4 ${answers[question.id]===String(k)?'border-blue-700 bg-blue-50 text-blue-950 ring-2 ring-blue-100':'border-slate-200 bg-white text-slate-800 hover:border-slate-400 hover:bg-slate-50'}`}>
             <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${answers[question.id]===String(k)?'bg-blue-700 text-white':'bg-slate-100 text-slate-700'}`}>{'ABCD'[k]}</span><span className="flex-1">{choice}</span>{answers[question.id]===String(k)&&<Check size={17} aria-label="Selected" className="text-blue-800"/>}</button>)}</div>
-          <div className="flex min-h-6 items-center justify-between gap-2 text-xs text-slate-600" aria-live="polite">{saveMessage?<span className="inline-flex items-center gap-1.5"><Check size={14} className="text-emerald-700"/>{saveMessage}</span>:<span>{storageMode==='local'?'Saved in this browser':'Saved to your exam attempt'}</span>}<span>{saving?'Saving…':''}</span></div>
+          <div className="flex min-h-6 items-center justify-between gap-2 text-xs text-slate-600" aria-live="polite">{saveMessage?<span className="inline-flex items-center gap-1.5"><Check size={14} className="text-emerald-700"/>{saveMessage}</span>:<span>Saved in this browser</span>}<span>{saving?'Saving…':''}</span></div>
           {error&&<p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-4"><button type="button" className="btn-g" disabled={index===0||busy||saving} onClick={()=>setIndex(index-1)}><ChevronLeft size={16}/>Previous</button><div className="flex items-center gap-2">{index<questions.length-1?<button type="button" className="btn-p" disabled={busy||saving} onClick={()=>setIndex(index+1)}>Next question<ChevronRight size={16}/></button>:<button type="button" className="btn-p" disabled={busy||saving} onClick={()=>setConfirm(true)}><Send size={15}/>Review and submit</button>}</div></div>
         </section>

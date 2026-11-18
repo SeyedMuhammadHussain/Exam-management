@@ -3,13 +3,13 @@ import {NavLink,Outlet,useLocation,useNavigate} from 'react-router-dom'
 import {Activity,BarChart3,BookOpenCheck,ChevronDown,ClipboardCheck,FileText,GraduationCap,HelpCircle,LayoutDashboard,LogOut,Menu,Users,Bell,X} from 'lucide-react'
 import {useApp} from '../context/AppContext'
 import {examState,fmt} from '../utils/grade'
-import {Badge,EmptyState} from '../components/ui'
+import {EmptyState} from '../components/ui'
 
 const NAV={admin:[['/admin','Dashboard',LayoutDashboard],['/admin/exams','Exams',FileText],['/admin/questions','Questions',HelpCircle],['/admin/students','Students',Users],['/admin/results','Results',BarChart3]],student:[['/student','Dashboard',LayoutDashboard],['/student/results','My results',ClipboardCheck]]}
 const titles={'/admin':'Administrator overview','/admin/exams':'Exam management','/admin/questions':'Question bank','/admin/students':'Student directory','/admin/results':'Exam results','/student':'Student dashboard','/student/results':'My results'}
 
 export default function DashboardLayout(){
-  const {user,logout,exams,results,storageMode}=useApp(),nav=useNavigate(),loc=useLocation()
+  const {user,logout,exams,results}=useApp(),nav=useNavigate(),loc=useLocation()
   const [side,setSide]=useState(false),[menu,setMenu]=useState(null)
   const notes=useMemo(()=>user.role==='admin'
     ?[...results].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4).map(r=>({key:r.id,title:`${r.studentName||'A student'} submitted a result`,detail:`${r.examTitle||exams.find(e=>e.id===r.examId)?.title||'Exam'} · ${r.percent}%`,date:r.date}))
@@ -31,7 +31,6 @@ export default function DashboardLayout(){
         <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3"><button type="button" aria-label="Open navigation" aria-expanded={side} aria-controls="primary-navigation" className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden" onClick={()=>setSide(true)}><Menu size={20}/></button><div className="min-w-0"><div className="hidden text-xs font-semibold uppercase tracking-[.12em] text-slate-500 sm:block">{user.role==='admin'?'Administrator':'Student'} workspace</div><h1 className="truncate text-base font-bold text-slate-900 sm:mt-0.5 sm:text-lg">{pageTitle}</h1></div></div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            <Badge tone={storageMode==='local'?'amber':'green'}><span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current"/>{storageMode==='local'?'Local demo':'Backend'}</Badge>
             <div className="relative"><button type="button" aria-label="Notifications" aria-expanded={menu==='n'} aria-controls="notification-menu" className="relative rounded-xl p-2.5 text-slate-600 hover:bg-slate-100" onClick={()=>setMenu(menu==='n'?null:'n')}><Bell size={19}/>{notes.length>0&&<span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-600 ring-2 ring-white"/>}</button>
               {menu==='n'&&<div id="notification-menu" role="region" aria-label="Recent activity" className="absolute right-0 top-12 z-50 w-[min(21rem,calc(100vw-2rem))] rounded-2xl border border-slate-200 bg-white p-3 shadow-xl"><div className="flex items-center justify-between px-2 pb-2"><h2 className="text-sm font-bold text-slate-900">Recent activity</h2><Activity size={16} className="text-slate-500"/></div>{notes.length?notes.map(note=><div key={note.key} className="rounded-xl px-3 py-2.5 hover:bg-slate-50"><div className="text-sm font-semibold text-slate-800">{note.title}</div><div className="mt-0.5 text-xs leading-5 text-slate-600">{note.detail}{note.date?` · ${fmt(note.date)}`:''}</div></div>):<EmptyState title="You're all caught up" description="New exam activity will appear here."/>}</div>}
             </div>

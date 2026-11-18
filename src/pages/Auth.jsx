@@ -4,7 +4,7 @@ import {ArrowRight,Eye,EyeOff,GraduationCap,ShieldCheck,Timer} from 'lucide-reac
 import {useApp} from '../context/AppContext'
 
 export default function Auth({mode}){
-  const {login,signup,storageMode}=useApp(),nav=useNavigate(),su=mode==='signup'
+  const {login,signup}=useApp(),nav=useNavigate(),su=mode==='signup'
   const [f,setF]=useState({name:'',email:'',password:''}),[show,setShow]=useState(false),[err,setErr]=useState(''),[ok,setOk]=useState(''),[busy,setBusy]=useState(false)
   const go=async e=>{
     e.preventDefault();setErr('');setOk('')
@@ -40,9 +40,9 @@ export default function Auth({mode}){
         {err&&<p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{err}</p>}
         {ok&&<p role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{ok}</p>}
         <button className="btn-p w-full" disabled={busy}>{busy?'Please wait…':su?'Create student account':'Sign in'}{!busy&&<ArrowRight size={16}/>}</button>
-        {!su&&<div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-600">{storageMode==='local'?<><strong className="text-slate-800">Local demo accounts</strong><br/>Admin: admin@school.edu / admin123<br/>Student: sara@school.edu / student123</>:'Demo account credentials are configured when the backend is seeded.'}</div>}
+        {!su&&<div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-600"><strong className="text-slate-800">Demo accounts</strong><br/>Admin: admin@school.edu / admin123<br/>Student: sara@school.edu / student123</div>}
         <p className="text-center text-sm text-slate-600">{su?'Already registered?':'New student?'} <Link className="font-semibold text-blue-700 underline-offset-4 hover:text-blue-900 hover:underline" to={su?'/login':'/signup'}>{su?'Sign in':'Create an account'}</Link></p>
-        <p className="text-center text-xs text-slate-500">{storageMode==='local'?'Local demo mode':'Secure school workspace'}</p>
+        <p className="text-center text-xs text-slate-500">Data is saved in this browser</p>
       </form>
     </main>
   </div>
